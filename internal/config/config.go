@@ -3,13 +3,14 @@ package config
 import (
 	"log"
 
-	"github.com/spf13/viper"
+	"github.com/spf13/viper" // Viper 是一个非常流行的 Go 配置库，支持多种格式（JSON, YAML, TOML 等）和环境变量，非常适合我们的需求
 )
 
 // AppConfig 是总配置结构体
 type AppConfig struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	Jwt      JWTConfig
 }
 
 type ServerConfig struct {
@@ -17,6 +18,10 @@ type ServerConfig struct {
 }
 type DatabaseConfig struct {
 	DSN string
+}
+type JWTConfig struct {
+	Secret string
+	Expire int
 }
 
 // Conf 是一个全局变量，包含解析后的全部配置
