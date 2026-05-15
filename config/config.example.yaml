@@ -1,0 +1,4 @@
+server:
+  port: 8080
+database:
+  dsn: "host=localhost user=postgres password=你的密码 dbname=usermanager port=5432 sslmode=disable TimeZone=Asia/Shanghai"
