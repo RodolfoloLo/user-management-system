@@ -1,4 +1,4 @@
-package params
+﻿package params
 
 // 注册与创建用户
 type RegisterReq struct {
@@ -14,7 +14,8 @@ type LoginReq struct {
 	Password string `json:"password"`
 }
 
-// 更新参数
+// 更新用户信息参数
 type UpdateUserReq struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
 }
