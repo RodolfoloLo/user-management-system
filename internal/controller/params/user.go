@@ -5,7 +5,6 @@ type RegisterReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
-	IsAdmin  bool   `json:"is_admin"`
 }
 
 // 登录参数

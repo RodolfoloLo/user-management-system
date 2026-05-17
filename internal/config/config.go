@@ -11,6 +11,7 @@ type AppConfig struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	Jwt      JWTConfig
+	Admin    AdminConfig
 }
 
 type ServerConfig struct {
@@ -22,6 +23,10 @@ type DatabaseConfig struct {
 type JWTConfig struct {
 	Secret string
 	Expire int
+}
+
+type AdminConfig struct {
+	BootstrapSecret string
 }
 
 // Conf 是一个全局变量，包含解析后的全部配置

@@ -13,28 +13,54 @@ import (
 func SetupRouter(e *echo.Echo) {
 	api := e.Group("/api")
 
-	// 公开路由 (不拦)
+	// 公开路由
 	api.POST("/register", controller.Register)
 	api.POST("/login", controller.Login)
+	api.POST("/admin/login", controller.AdminLogin)
+	api.POST("/admin/bootstrap", controller.AdminBootstrap)
 
-	// 私密路由 (JWT 拦截)
+	// 私密路由
 	authGroup := api.Group("/v1")
 
-	// 配置 JWT 中间件：关键在于告诉 echojwt 我们使用了结构体 JWTClaims！
-	config := echojwt.Config{
+	jwtConfig := echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(utils.JWTClaims) // 让框架解析到我们的自定义Struct中
+			return new(utils.JWTClaims)
 		},
 		SigningKey: []byte(config.Conf.Jwt.Secret),
 	}
-	authGroup.Use(echojwt.WithConfig(config))
+	authGroup.Use(echojwt.WithConfig(jwtConfig))
 
 	// 用户操作
 	authGroup.GET("/user/me", controller.GetUserInfo)
 	authGroup.PUT("/user/me", controller.UpdateUser)
 
 	// 管理员操作
-	authGroup.DELETE("/users/:id", controller.AdminDeleteUser)
+	adminGroup := authGroup.Group("/admin")
+	adminGroup.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			token, ok := c.Get("user").(*jwt.Token)
+			if !ok || token == nil {
+				return utils.Error(c, 401, "认证信息无效")
+			}
+
+			claims, ok := token.Claims.(*utils.JWTClaims)
+			if !ok || claims == nil {
+				return utils.Error(c, 401, "认证信息无效")
+			}
+
+			if !claims.IsAdmin {
+				return utils.Error(c, 403, "仅管理员可访问")
+			}
+
+			return next(c)
+		}
+	})
+
+	adminGroup.POST("/register", controller.AdminRegister)
+	adminGroup.POST("/users", controller.AdminCreateUser)
+	adminGroup.GET("/users/:id", controller.AdminGetUserInfo)
+	adminGroup.PUT("/users/:id", controller.AdminUpdateUser)
+	adminGroup.DELETE("/users/:id", controller.AdminDeleteUser)
 }
 
 /* 关于 echo-jwt 中间件的使用

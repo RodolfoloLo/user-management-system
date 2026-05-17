@@ -5,3 +5,5 @@ database:
 jwt:
   secret:
   expire: 3600
+admin:
+  bootstrap_secret: "change-me-before-first-admin-bootstrap"

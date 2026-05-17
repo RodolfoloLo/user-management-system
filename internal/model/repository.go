@@ -112,3 +112,13 @@ func DeleteUserByID(id uint) error {
 
 	return nil
 }
+
+// 检查当前是否至少存在一个管理员账户
+func HasAnyAdmin() (bool, error) {
+	var count int64
+	if err := DB.Model(&User{}).Where("is_admin = ?", true).Count(&count).Error; err != nil {
+		return false, ErrDatabaseError
+	}
+
+	return count > 0, nil
+}

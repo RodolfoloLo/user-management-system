@@ -2,7 +2,6 @@
 
 import (
 	"errors"
-	"strconv"
 	"ums/internal/controller/params"
 	"ums/internal/model"
 	"ums/internal/utils"
@@ -125,29 +124,4 @@ func UpdateUser(c echo.Context) error {
 	}
 
 	return utils.Success(c, "更新成功")
-}
-
-func AdminDeleteUser(c echo.Context) error {
-	userToken := c.Get("user").(*jwt.Token)
-	claims := userToken.Claims.(*utils.JWTClaims)
-
-	if !claims.IsAdmin {
-		return utils.Error(c, 403, "权限不足，仅管理员可删除用户")
-	}
-
-	idParam := c.Param("id")
-	id, err := strconv.ParseUint(idParam, 10, 32)
-	if err != nil {
-		return utils.Error(c, 400, "无效的用户 ID")
-	}
-
-	deleteErr := model.DeleteUserByID(uint(id))
-	if deleteErr != nil {
-		if errors.Is(deleteErr, model.ErrUserNotFound) {
-			return utils.Error(c, 404, "用户不存在")
-		}
-		return utils.Error(c, 500, "删除失败，请稍后重试")
-	}
-
-	return utils.Success(c, "删除成功")
 }
